@@ -1,7 +1,12 @@
-import { Zap, Shield, Phone, Mail, MapPin, Share2, Send, Rss, ArrowRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { Zap, Shield, Phone, Mail, MapPin, Share2, Send, Rss, ArrowRight, X, Clock, Car, Users, BookOpen } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function HeroOverlay({ activeCarIndex, setActiveCarIndex }: { activeCarIndex: number, setActiveCarIndex: (idx: number) => void }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [activePage, setActivePage] = useState<string | null>(null);
+
   const cars = [
     {
       power: '740',
@@ -28,21 +33,116 @@ export default function HeroOverlay({ activeCarIndex, setActiveCarIndex }: { act
 
   const activeCar = cars[activeCarIndex];
 
+  const menuItems = [
+    { label: 'About',        page: 'about',       Icon: Users    },
+    { label: 'Our Rental',   page: 'rental',      Icon: Car      },
+    { label: 'Collections',  page: 'collections', Icon: BookOpen },
+    { label: 'Contact',      page: 'contact',     Icon: Phone    },
+  ];
+
+  const openPage = (page: string) => { setActivePage(page); };
+  const closeMenu = () => { setMenuOpen(false); setActivePage(null); };
+
   return (
     <div style={{ width: '100vw', padding: '0 5vw', color: 'white' }}>
-      {/* Navigation Bar */}
-      <nav style={{ position: 'fixed', top: 0, left: 0, width: '100%', padding: '2rem 5vw', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 100 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', cursor: 'pointer' }}>
-          <div style={{ width: '30px', height: '2px', background: 'white' }}></div>
-          <div style={{ width: '20px', height: '2px', background: 'white' }}></div>
-          <div style={{ width: '20px', height: '2px', background: 'white' }}></div>
-        </div>
-        <div style={{ display: 'flex', gap: '2rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
-          <span style={{ cursor: 'pointer' }}>Rental</span>
-          <span style={{ cursor: 'pointer' }}>Collections</span>
-          <span style={{ cursor: 'pointer' }}>Contact</span>
-        </div>
-      </nav>
+
+      {/* ── Portal: Nav bar + Menu overlay rendered directly to document.body
+           so they escape the ScrollControls transform context ── */}
+      {createPortal(
+        <>
+          {/* Navigation Bar */}
+          <nav style={{ position: 'fixed', top: 0, left: 0, width: '100%', padding: '2rem 5vw', display: 'flex', justifyContent: 'space-between', alignItems: 'center', zIndex: 300, fontFamily: 'Outfit, sans-serif' }}>
+            {/* Hamburger → X */}
+            <motion.button
+              onClick={() => { setMenuOpen(!menuOpen); setActivePage(null); }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', display: 'flex', flexDirection: 'column', gap: '6px' }}
+              aria-label="Toggle menu"
+            >
+              <motion.div animate={{ rotate: menuOpen ? 45 : 0, y: menuOpen ? 8 : 0 }} transition={{ duration: 0.3 }} style={{ width: '30px', height: '2px', background: 'white', borderRadius: '2px', transformOrigin: 'center' }} />
+              <motion.div animate={{ opacity: menuOpen ? 0 : 1 }} transition={{ duration: 0.2 }} style={{ width: '20px', height: '2px', background: 'white', borderRadius: '2px' }} />
+              <motion.div animate={{ rotate: menuOpen ? -45 : 0, y: menuOpen ? -8 : 0 }} transition={{ duration: 0.3 }} style={{ width: '20px', height: '2px', background: 'white', borderRadius: '2px', transformOrigin: 'center' }} />
+            </motion.button>
+          </nav>
+
+          {/* Full-screen Menu Overlay */}
+          <AnimatePresence>
+            {menuOpen && (
+              <motion.div
+                key="menu-overlay"
+                initial={{ clipPath: 'circle(0% at 3.5rem 3.5rem)' }}
+                animate={{ clipPath: 'circle(150% at 3.5rem 3.5rem)' }}
+                exit={{ clipPath: 'circle(0% at 3.5rem 3.5rem)' }}
+                transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
+                style={{
+                  position: 'fixed', inset: 0, zIndex: 200,
+                  background: 'linear-gradient(135deg, #0a0a0a 0%, #111 60%, #1a0800 100%)',
+                  display: 'flex', flexDirection: 'column',
+                  fontFamily: 'Outfit, sans-serif',
+                  color: 'white',
+                }}
+              >
+                {/* Header row inside overlay */}
+                <div style={{ padding: '2rem 5vw', display: 'flex', alignItems: 'center' }}>
+                  <span style={{ fontSize: '1.6rem', letterSpacing: '4px', color: '#ff7700', fontFamily: 'Bebas Neue, sans-serif' }}>APEXDRIVE</span>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {activePage === null ? (
+                    /* Main menu list */
+                    <motion.div
+                      key="menu-list"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 10vw' }}
+                    >
+                      {menuItems.map(({ label, page, Icon }, i) => (
+                        <motion.div
+                          key={label}
+                          initial={{ opacity: 0, x: -60 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.4, delay: 0.06 * i }}
+                          onClick={() => openPage(page)}
+                          style={{ borderBottom: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer' }}
+                        >
+                          <motion.div
+                            whileHover={{ x: 16 }}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.8rem 0' }}
+                          >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                              <div style={{ color: '#ff7700', opacity: 0.75 }}><Icon size={22} /></div>
+                              <span style={{ fontSize: 'clamp(2.2rem, 5.5vw, 4.5rem)', fontFamily: 'Bebas Neue, sans-serif', letterSpacing: '3px', color: 'white', lineHeight: 1 }}>
+                                {label}
+                              </span>
+                            </div>
+                            <span style={{ fontSize: '1.4rem', color: 'rgba(255,255,255,0.25)' }}>→</span>
+                          </motion.div>
+                        </motion.div>
+                      ))}
+
+                      {/* Bottom socials */}
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.4, delay: 0.35 }}
+                        style={{ display: 'flex', gap: '2rem', marginTop: '2.5rem' }}
+                      >
+                        {['Instagram', 'Twitter', 'YouTube'].map(s => (
+                          <span key={s} style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.28)', textTransform: 'uppercase', letterSpacing: '2px', cursor: 'pointer' }}>{s}</span>
+                        ))}
+                      </motion.div>
+                    </motion.div>
+                  ) : (
+                    <MenuPage page={activePage} onBack={() => setActivePage(null)} />
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>,
+        document.body
+      )}
 
       {/* Page 1: Hero Carousel */}
       <section style={{ height: '100vh', position: 'relative', overflow: 'hidden' }}>
@@ -865,5 +965,255 @@ function Footer() {
         APEXDRIVE
       </div>
     </footer>
+  );
+}
+
+// ─── Menu Page (Coming Soon) ─────────────────────────────────────────────────
+
+const pageData: Record<string, {
+  title: string;
+  tag: string;
+  desc: string;
+  Icon: React.ElementType;
+  accent: string;
+}> = {
+  about: {
+    title: 'ABOUT US',
+    tag: 'Our Story',
+    desc: 'We are crafting something extraordinary — a deep dive into the ApexDrive legacy, our passion for performance, and the team behind every flawless rental experience.',
+    Icon: Users,
+    accent: '#ff7700',
+  },
+  rental: {
+    title: 'OUR RENTAL',
+    tag: 'Fleet & Booking',
+    desc: 'A seamless booking experience is on its way. Browse our full fleet, configure your rental duration, and drive away in minutes — all from one screen.',
+    Icon: Car,
+    accent: '#e03030',
+  },
+  collections: {
+    title: 'COLLECTIONS',
+    tag: 'Curated Lineups',
+    desc: 'Hand-picked collections of the world\'s most thrilling machines — from track-ready supercars to luxury SUVs. Launching soon with exclusive early-access drops.',
+    Icon: BookOpen,
+    accent: '#4a90e2',
+  },
+  contact: {
+    title: 'CONTACT',
+    tag: 'Get in Touch',
+    desc: 'Our concierge team is standing by. A full-featured contact portal with live chat, call scheduling, and showroom booking is arriving very soon.',
+    Icon: Phone,
+    accent: '#22c55e',
+  },
+};
+
+function MenuPage({ page, onBack }: { page: string; onBack: () => void }) {
+  const data = pageData[page];
+  if (!data) return null;
+  const { title, tag, desc, Icon, accent } = data;
+
+  return (
+    <motion.div
+      key={`page-${page}`}
+      initial={{ opacity: 0, x: 60 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 60 }}
+      transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+      style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        padding: '0 8vw',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Ambient glow */}
+      <div style={{
+        position: 'absolute',
+        width: '500px', height: '500px',
+        borderRadius: '50%',
+        background: `radial-gradient(ellipse, ${accent}18 0%, transparent 65%)`,
+        pointerEvents: 'none',
+      }} />
+
+      {/* Ghost title watermark */}
+      <div className="font-bebas" style={{
+        position: 'absolute',
+        fontSize: 'clamp(6rem, 20vw, 18rem)',
+        color: 'rgba(255,255,255,0.025)',
+        whiteSpace: 'nowrap',
+        pointerEvents: 'none',
+        letterSpacing: '0.05em',
+        userSelect: 'none',
+      }}>
+        {title}
+      </div>
+
+      {/* Back button */}
+      <motion.button
+        whileHover={{ x: -4 }}
+        onClick={onBack}
+        style={{
+          position: 'absolute',
+          top: '1.5rem',
+          left: '5vw',
+          background: 'none',
+          border: 'none',
+          color: 'rgba(255,255,255,0.4)',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          fontSize: '0.8rem',
+          textTransform: 'uppercase',
+          letterSpacing: '2px',
+          fontFamily: 'Outfit, sans-serif',
+        }}
+      >
+        ← Back
+      </motion.button>
+
+      {/* Icon */}
+      <motion.div
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.1, type: 'spring' }}
+        style={{
+          width: '90px', height: '90px',
+          borderRadius: '50%',
+          border: `1.5px solid ${accent}55`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: `${accent}12`,
+          color: accent,
+          marginBottom: '2rem',
+          position: 'relative',
+          zIndex: 2,
+        }}
+      >
+        <Icon size={36} />
+      </motion.div>
+
+      {/* Tag */}
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        style={{ fontSize: '0.72rem', color: accent, letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '1rem', position: 'relative', zIndex: 2 }}
+      >
+        {tag}
+      </motion.p>
+
+      {/* Title */}
+      <motion.h2
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="font-bebas"
+        style={{ fontSize: 'clamp(3rem, 8vw, 7rem)', letterSpacing: '4px', lineHeight: 1, marginBottom: '1.5rem', position: 'relative', zIndex: 2 }}
+      >
+        {title}
+      </motion.h2>
+
+      {/* Clock badge */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.25 }}
+        style={{
+          display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+          background: `${accent}18`,
+          border: `1px solid ${accent}44`,
+          borderRadius: '999px',
+          padding: '0.4rem 1.2rem',
+          fontSize: '0.75rem',
+          color: accent,
+          textTransform: 'uppercase',
+          letterSpacing: '2px',
+          marginBottom: '2rem',
+          position: 'relative', zIndex: 2,
+        }}
+      >
+        <Clock size={13} />
+        Coming Soon
+      </motion.div>
+
+      {/* Description */}
+      <motion.p
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        style={{
+          fontSize: '1rem',
+          color: 'rgba(255,255,255,0.45)',
+          lineHeight: 1.8,
+          maxWidth: '520px',
+          marginBottom: '3rem',
+          position: 'relative', zIndex: 2,
+        }}
+      >
+        {desc}
+      </motion.p>
+
+      {/* Notify input */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.38 }}
+        style={{ display: 'flex', gap: 0, position: 'relative', zIndex: 2 }}
+      >
+        <input
+          type="email"
+          placeholder="Notify me when live..."
+          style={{
+            background: 'rgba(255,255,255,0.05)',
+            border: `1px solid ${accent}44`,
+            borderRight: 'none',
+            borderRadius: '8px 0 0 8px',
+            padding: '13px 22px',
+            color: 'white',
+            fontSize: '0.88rem',
+            outline: 'none',
+            width: '260px',
+            fontFamily: 'Outfit, sans-serif',
+          }}
+        />
+        <motion.button
+          whileHover={{ background: accent }}
+          whileTap={{ scale: 0.96 }}
+          style={{
+            background: `${accent}cc`,
+            color: 'white',
+            border: 'none',
+            borderRadius: '0 8px 8px 0',
+            padding: '13px 20px',
+            cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '6px',
+            fontSize: '0.88rem',
+            fontWeight: 600,
+            fontFamily: 'Outfit, sans-serif',
+            transition: 'background 0.25s ease',
+          }}
+        >
+          Notify Me <ArrowRight size={14} />
+        </motion.button>
+      </motion.div>
+
+      {/* Decorative lines */}
+      <motion.div
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: 1 }}
+        transition={{ delay: 0.4, duration: 0.8 }}
+        style={{
+          position: 'absolute', bottom: '6vh', left: '10vw', right: '10vw',
+          height: '1px',
+          background: `linear-gradient(90deg, transparent, ${accent}33, transparent)`,
+          transformOrigin: 'center',
+        }}
+      />
+    </motion.div>
   );
 }
