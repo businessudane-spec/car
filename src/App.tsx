@@ -17,7 +17,7 @@ function App() {
         <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
         
         <Suspense fallback={null}>
-          <ScrollControls pages={4} damping={0.25}>
+          <ScrollControls pages={5} damping={0.25}>
             <Scene activeCarIndex={activeCarIndex} />
             
             <Scroll html style={{ width: '100vw' }}>
