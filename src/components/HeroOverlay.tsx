@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Zap, Shield, Phone, Mail, MapPin, Share2, Send, Rss, ArrowRight, X, Clock, Car, Users, BookOpen } from 'lucide-react';
+import { Zap, Shield, Phone, Mail, MapPin, Share2, Send, Rss, ArrowRight, Clock, Car, Users, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function HeroOverlay({ activeCarIndex, setActiveCarIndex }: { activeCarIndex: number, setActiveCarIndex: (idx: number) => void }) {
@@ -41,7 +41,6 @@ export default function HeroOverlay({ activeCarIndex, setActiveCarIndex }: { act
   ];
 
   const openPage = (page: string) => { setActivePage(page); };
-  const closeMenu = () => { setMenuOpen(false); setActivePage(null); };
 
   return (
     <div style={{ width: '100vw', padding: '0 5vw', color: 'white' }}>
@@ -1091,7 +1090,7 @@ function MenuPage({ page, onBack }: { page: string; onBack: () => void }) {
           zIndex: 2,
         }}
       >
-        <Icon size={36} />
+        {React.createElement(Icon as React.ComponentType<{ size: number }>, { size: 36 })}
       </motion.div>
 
       {/* Tag */}
