@@ -47,22 +47,20 @@ export default function HomePage({ onEnter }: HomePageProps) {
       <nav style={{
         position: 'fixed', top: 0, left: 0, width: '100%', zIndex: 100,
         padding: '1.4rem 5vw',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        display: 'flex', justifyContent: 'center', alignItems: 'center',
         background: 'linear-gradient(180deg, rgba(5,5,5,0.95) 0%, transparent 100%)',
         backdropFilter: 'blur(8px)',
       }}>
-        <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.8rem', letterSpacing: '4px', color: 'white' }}>
+        {/* Centered logo via absolute so Book Now doesn't shift it */}
+        <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.8rem', letterSpacing: '4px', color: 'white', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
           APEX<span style={{ color: '#ff7700' }}>DRIVE</span>
         </span>
-        <div style={{ display: 'flex', gap: '2.5rem', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: 'rgba(255,255,255,0.6)' }}>
-          {['Fleet', 'Locations', 'About', 'Contact'].map(item => (
-            <motion.span key={item} whileHover={{ color: '#ff7700' }} style={{ cursor: 'pointer', transition: 'color 0.2s' }}>{item}</motion.span>
-          ))}
-        </div>
+
+        {/* Book Now — right side */}
         <motion.button
-          whileHover={{ scale: 1.04, background: '#ff8811' }}
+          whileHover={{ scale: 1.04, background: '#ff8811', boxShadow: '0 6px 24px rgba(255,119,0,0.4)' }}
           whileTap={{ scale: 0.97 }}
-          style={{ background: '#ff7700', color: 'white', border: 'none', borderRadius: '8px', padding: '10px 24px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', letterSpacing: '1px', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}
+          style={{ marginLeft: 'auto', background: '#ff7700', color: 'white', border: 'none', borderRadius: '8px', padding: '10px 26px', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', letterSpacing: '1px', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif', transition: 'background 0.2s' }}
         >
           Book Now
         </motion.button>
@@ -365,6 +363,39 @@ export default function HomePage({ onEnter }: HomePageProps) {
           </motion.button>
         </motion.div>
       </section>
+
+      {/* ── FOOTER ── */}
+      <footer style={{
+        background: '#030303',
+        borderTop: '1px solid rgba(255,255,255,0.05)',
+        padding: '2.5rem 5vw',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '1.5rem',
+        fontFamily: 'Outfit, sans-serif',
+      }}>
+        {/* Brand */}
+        <span style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: '1.5rem', letterSpacing: '4px', color: 'white' }}>
+          APEX<span style={{ color: '#ff7700' }}>DRIVE</span>
+        </span>
+
+        {/* Quick links */}
+        <div style={{ display: 'flex', gap: '2rem' }}>
+          {['Fleet', 'About', 'Contact', 'Privacy'].map(item => (
+            <a key={item} href="#" style={{ fontSize: '0.78rem', color: 'rgba(255,255,255,0.35)', textDecoration: 'none', textTransform: 'uppercase', letterSpacing: '1.5px', transition: 'color 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#ff7700')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.35)')}
+            >{item}</a>
+          ))}
+        </div>
+
+        {/* Copyright */}
+        <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.2)' }}>
+          © 2026 ApexDrive. All rights reserved.
+        </p>
+      </footer>
 
     </div>
   );

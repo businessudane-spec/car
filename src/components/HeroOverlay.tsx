@@ -81,10 +81,7 @@ export default function HeroOverlay({ activeCarIndex, setActiveCarIndex }: { act
                   color: 'white',
                 }}
               >
-                {/* Header row inside overlay */}
-                <div style={{ padding: '2rem 5vw', display: 'flex', alignItems: 'center' }}>
-                  <span style={{ fontSize: '1.6rem', letterSpacing: '4px', color: '#ff7700', fontFamily: 'Bebas Neue, sans-serif' }}>APEXDRIVE</span>
-                </div>
+
 
                 <AnimatePresence mode="wait">
                   {activePage === null ? (
